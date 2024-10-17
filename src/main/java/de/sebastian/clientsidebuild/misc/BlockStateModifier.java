@@ -6,13 +6,16 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.command.FillCommand;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 
 public class BlockStateModifier {
     private Direction direction;
@@ -72,20 +75,33 @@ public class BlockStateModifier {
         return blockState;
     }
 
-    public static BlockState getBlockStateWithFacingDirectionBlock(Block with) {
-        BlockState blockState = with.getDefaultState();
-        Direction direction1 = Direction.UP;
-        //if(MinecraftClient.getInstance().crosshairTarget instanceof Block)
+    public BlockState getBlockStateWithFacingDirectionBlock(Block block, PlayerEntity player) {
+        BlockState state = block.getDefaultState();
 
-        //direction1 = with.getPlacementState(new ItemPlacementContext(MinecraftClient.getInstance().player, Hand.MAIN_HAND, MinecraftClient.getInstance().player.getMainHandStack()))
-
-        if (blockState.contains(Properties.FACING)) {
-            blockState = blockState.with(Properties.FACING, direction1);
-        } else {
-            //ClientsidebuildClient.logger.warn("Block does not support FACING property: " + with);
+        // Check for FACING property
+        if (state.contains(Properties.FACING)) {
+            Direction facingDirection = player.getHorizontalFacing().getOpposite();
+            state = state.with(Properties.FACING, facingDirection);
+        }
+        // Check for HORIZONTAL_FACING property (for blocks like stairs, furnaces)
+        else if (state.contains(Properties.HORIZONTAL_FACING)) {
+            Direction horizontalFacing = player.getHorizontalFacing().getOpposite();
+            state = state.with(Properties.HORIZONTAL_FACING, horizontalFacing);
         }
 
-        return blockState;
+        // Set the block's axis if it's a block like logs
+        if (state.contains(Properties.AXIS)) {
+            // Determine axis based on player's pitch (vertical look direction)
+            if (player.getPitch(1.0F) < -45) {
+                state = state.with(Properties.AXIS, Direction.Axis.Y);  // Looking up
+            } else if (player.getPitch(1.0F) > 45) {
+                state = state.with(Properties.AXIS, Direction.Axis.Y);  // Looking down
+            } else {
+                state = state.with(Properties.AXIS, player.getHorizontalFacing().getAxis());  // Horizontal look direction
+            }
+        }
+
+        return state;
     }
 
     @Deprecated

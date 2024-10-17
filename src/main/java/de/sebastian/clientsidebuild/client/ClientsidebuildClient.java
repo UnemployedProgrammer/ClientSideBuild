@@ -38,7 +38,9 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 @Environment(EnvType.CLIENT)
 public class ClientsidebuildClient implements ClientModInitializer {
@@ -49,36 +51,38 @@ public class ClientsidebuildClient implements ClientModInitializer {
     private static KeyBinding keyBinding3;
     private static KeyBinding keyBinding4;
     public static Boolean ENABLED = true;
+    private Map<BlockPos, BlockState> latestStates = new HashMap<>();
     public static int RENDER_OFFSET_X = 0;
     public static int RENDER_OFFSET_Y = 0;
     public static int RENDER_OFFSET_Z = 0;
     public static BlockPos knownPos1;
     public static BlockPos knownPos2;
-    public static BlockStateModifier BLOCK_STATE_MODIFIER = new BlockStateModifier().setDirection(Direction.UP);
+    public static BlockStateModifier BLOCK_STATE_MODIFIER = new BlockStateModifier();
 
 
     @Override
     public void onInitializeClient() {
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
             if(ENABLED) {
+                latestStates.clear();
                 MinecraftClient client = MinecraftClient.getInstance();
                 //BlockPos pos = client.player.getBlockPos();
                 BlockState state = null;
 
                 if(client.player.getMainHandStack().getItem() instanceof BlockItem blockItem) {
-                    state = BLOCK_STATE_MODIFIER.getBlockStateWithBlock(blockItem.getBlock());
+                    state = BLOCK_STATE_MODIFIER.getBlockStateWithFacingDirectionBlock(blockItem.getBlock(), client.player);
                 }
 
                 if(state != null) {
 
                     if(knownPos1 == null) {
                         ENABLED = false;
-                        client.player.sendMessage(Text.literal("EMERGENCY_DISABLE"));
+                        //client.player.sendMessage(Text.literal("EMERGENCY_DISABLE"));
                         return;
                     }
                     if(knownPos2 == null) {
                         ENABLED = false;
-                        client.player.sendMessage(Text.literal("EMERGENCY_DISABLE"));
+                        //client.player.sendMessage(Text.literal("EMERGENCY_DISABLE"));
                         return;
                     }
 
@@ -87,6 +91,8 @@ public class ClientsidebuildClient implements ClientModInitializer {
 
                     while (positions.hasNext()) {
                         BlockPos currentPos = positions.next();
+
+                        latestStates.put(currentPos, state);
 
                         // Example: set block to air (this can be changed to any other operation)
                         renderBlock(context, state, currentPos);
@@ -100,14 +106,14 @@ public class ClientsidebuildClient implements ClientModInitializer {
         keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "keybinds.clientsidebuilding.toggle", // The translation key of the keybinding's name
                 InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-                GLFW.GLFW_KEY_INSERT, // The keycode of the key
+                GLFW.GLFW_KEY_KP_0, // The keycode of the key
                 "keybinds.clientsidebuilding" // The translation key of the keybinding's category.
         ));
 
         keyBinding2 = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "keybinds.clientsidebuilding.opengui", // The translation key of the keybinding's name
+                "keybinds.clientsidebuilding.place", // The translation key of the keybinding's name
                 InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-                GLFW.GLFW_KEY_DELETE, // The keycode of the key
+                GLFW.GLFW_KEY_KP_ENTER, // The keycode of the key
                 "keybinds.clientsidebuilding" // The translation key of the keybinding's category.
         ));
 
@@ -134,7 +140,12 @@ public class ClientsidebuildClient implements ClientModInitializer {
                 minecraftClient.player.sendMessage(Text.translatable("info.clientsidebuilding.toggled"), false);
             }
             while (keyBinding2.wasPressed()) {
-                minecraftClient.setScreen(new DirectionScreen());
+                if(ENABLED) {
+                    latestStates.entrySet().forEach(entry -> {
+                        ServerBlockPlacer.placeBlockWithState(entry.getKey(), entry.getValue());
+                    });
+
+                }
             }
             while (keyBinding3.wasPressed()) {
                 knownPos1 = getHoveringBlock(minecraftClient);

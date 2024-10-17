@@ -1,7 +1,7 @@
 {
   "keybinds.clientsidebuilding": "Client Side Building",
   "keybinds.clientsidebuilding.toggle": "Toggle",
-  "keybinds.clientsidebuilding.opengui": "Configure Block State",
+  "keybinds.clientsidebuilding.place": "Place Selection",
   "keybinds.clientsidebuilding.pos1": "Set First Position",
   "keybinds.clientsidebuilding.pos2": "Set Second Position",
 
