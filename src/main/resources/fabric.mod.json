@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "clientsidebuild",
+  "version": "${version}",
+  "name": "ClientSideBuild",
+  "description": "Easier Building of Triangles in Survival and Creative on Vanilla/Plugin Servers. \n Notice: May be not allowed on some server networks.",
+  "authors": ["Sebastian"],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/clientsidebuild/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "de.sebastian.clientsidebuild.client.ClientsidebuildClient"
+    ]
+  },
+  "mixins": [
+    "clientsidebuild.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "fabric-key-binding-api-v1": "*",
+    "minecraft": "${minecraft_version}"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.website": "https://unemployedprogrammer.github.io/UnemployedGamesPage/ClientSideBuilding/"
+      }
+    }
+  }
+}

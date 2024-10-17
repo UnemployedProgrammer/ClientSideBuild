@@ -1,0 +1,18 @@
+{
+  "keybinds.clientsidebuilding": "Client Side Building",
+  "keybinds.clientsidebuilding.toggle": "Toggle",
+  "keybinds.clientsidebuilding.opengui": "Configure Block State",
+  "keybinds.clientsidebuilding.pos1": "Set First Position",
+  "keybinds.clientsidebuilding.pos2": "Set Second Position",
+
+  "info.clientsidebuilding.toggled": "Toggled Client Side Building!",
+  "info.clientsidebuilding.errblockposfound": "No Targeted Block Found, Using Players Pos!",
+
+  "button.clientsidebuilding.north": "North",
+  "button.clientsidebuilding.east": "East",
+  "button.clientsidebuilding.south": "South",
+  "button.clientsidebuilding.west": "West",
+  "button.clientsidebuilding.up": "Up",
+  "button.clientsidebuilding.down": "Down",
+  "button.clientsidebuilding.save": "Save"
+}

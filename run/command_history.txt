@@ -1,0 +1,5 @@
+/time set day
+/gamerule doWeatherCycle false
+/gamerule doDaylightCycle false
+/time set noon
+/difficulty peaceful
